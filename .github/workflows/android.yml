@@ -1,0 +1,35 @@
+name: Build APK for AllDownloader
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Clonar el repositorio
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Configurar Python y Buildozer
+      - name: Setup Python and Buildozer
+        run: |
+          sudo apt update
+          sudo apt install -y python3-venv openjdk-11-jdk build-essential libffi-dev libssl-dev zlib1g-dev
+          pip install --upgrade pip
+          pip install buildozer
+
+      # 3. Compilar el APK
+      - name: Build APK
+        run: |
+          buildozer android debug
+
+      # 4. Subir el APK como artefacto
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: AllDownloader-APK
+          path: bin/*.apk
