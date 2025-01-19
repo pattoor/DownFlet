@@ -7,6 +7,7 @@ from io import BytesIO
 def main(page: ft.Page):
     # Configuración de la página
     page.title = "Descargador de Videos"
+    page.horizontal_alignment = ft.MainAxisAlignment.CENTER
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
 
     # Elementos de la UI
