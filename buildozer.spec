@@ -8,6 +8,11 @@ version = 0.1
 requirements = python3, flet, yt-dlp, requests, pillow
 orientation = portrait
 android.permissions = INTERNET
+android.sdk = 33
+android.ndk = 25b
+android.api = 33
+android.build_tools_version = 33.0.2
+
 
 [buildozer]
 log_level = 2
