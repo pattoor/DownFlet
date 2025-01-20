@@ -11,6 +11,7 @@ android.permissions = INTERNET
 android.sdk = 33
 android.ndk = 25b
 android.api = 33
+android.platform = android-33  # en buildozer.spec, en la parte de android
 android.build_tools_version = 33.0.2  # Esta versión debería ser compatible
 
 [buildozer]
