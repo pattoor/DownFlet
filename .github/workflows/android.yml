@@ -6,42 +6,43 @@ on:
       - main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest  # Usamos Ubuntu, ya que es más fácil gestionar SDK y herramientas en Linux
+  build-apk:
+    runs-on: ubuntu-22.04
 
     steps:
+      # 1. Clonar el repositorio
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Set up JDK 11
-        uses: actions/setup-java@v2
-        with:
-          java-version: '11'
-
-      - name: Install Android SDK
+      # 2. Configurar Python, Cython y Buildozer
+      - name: Setup Python, Cython and Buildozer
         run: |
-          # Instalar SDK de Android
           sudo apt update
-          sudo apt install -y android-sdk
+          sudo apt install -y python3 python3-venv python3-pip openjdk-11-jdk build-essential libffi-dev libssl-dev zlib1g-dev unzip wget
+          pip install --upgrade pip
+          pip install cython
+          pip install buildozer
 
-      - name: Accept Android SDK licenses
+      # 3. Configurar Android SDK
+      - name: Setup Android SDK
         run: |
-          yes | sudo sdkmanager --licenses
+          wget https://dl.google.com/android/repository/commandlinetools-linux-9123335_latest.zip -O cmdline-tools.zip
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          unzip cmdline-tools.zip -d $HOME/android-sdk/cmdline-tools
+          mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
+          yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
+          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2" "ndk;25.2.9519653"
+          export ANDROID_HOME=$HOME/android-sdk
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/33.0.2:$PATH
 
-      - name: Install build-tools and platform-tools
-        run: |
-          # Instalar las herramientas necesarias (versiones especificas)
-          sudo sdkmanager "platform-tools" "build-tools;33.0.2" "platforms;android-33"
-
-      - name: Install Buildozer
-        run: |
-          python3 -m pip install --upgrade buildozer
-
-      - name: Install Python dependencies
-        run: |
-          pip install -r requirements.txt  # Asegúrate de tener un requirements.txt con flet, yt-dlp, etc.
-
+      # 4. Compilar el APK
       - name: Build APK
         run: |
-          # Ejecutar el proceso de construcción
-          buildozer android debug  # Asegúrate de que buildozer esté configurado correctamente
+          buildozer android debug
+
+      # 5. Subir el APK como artefacto
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: AllDownloader-APK
+          path: bin/*.apk
