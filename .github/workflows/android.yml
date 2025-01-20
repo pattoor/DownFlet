@@ -18,26 +18,40 @@ jobs:
       - name: Setup Python, Cython and Buildozer
         run: |
           sudo apt update
-          sudo apt install -y python3 python3-venv python3-pip openjdk-11-jdk build-essential libffi-dev libssl-dev zlib1g-dev unzip wget
+          sudo apt install -y python3 python3-venv python3-pip openjdk-11-jdk build-essential libffi-dev libssl-dev zlib1g-dev unzip wget python3-dev
           pip install --upgrade pip
+          pip install cython
           pip install buildozer
 
       # 3. Configurar Android SDK
       - name: Setup Android SDK
         run: |
+          # Descargar y extraer herramientas de línea de comandos del SDK
           wget https://dl.google.com/android/repository/commandlinetools-linux-9123335_latest.zip -O cmdline-tools.zip
           mkdir -p $HOME/android-sdk/cmdline-tools
           unzip cmdline-tools.zip -d $HOME/android-sdk/cmdline-tools
           mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
+          
+          # Aceptar licencias
           yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
+          
+          # Instalar las herramientas necesarias (plataformas, build-tools y NDK)
           $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2" "ndk;25.2.9519653"
+          
+          # Descargar AIDL
+          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "build-tools;33.0.2" "platform-tools" "aidl"
+          
+          # Establecer las variables de entorno
           export ANDROID_HOME=$HOME/android-sdk
           export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/33.0.2:$PATH
+          
+          # Verificar que todo esté instalado correctamente
+          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --list
 
       # 4. Compilar el APK
       - name: Build APK
         run: |
-          pip install cython
+          # Ejecutar el comando para compilar el APK
           buildozer android debug
 
       # 5. Subir el APK como artefacto
