@@ -1,5 +1,4 @@
-<<<<<<< HEAD
 flet
-=======
-flet
->>>>>>> development
+yt-dlp
+requests
+pillow
