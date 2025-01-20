@@ -14,18 +14,29 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2. Configurar Python, Java, y Buildozer
-      - name: Setup Python, Java and Buildozer
+      # 2. Configurar Python, Java, Buildozer y Android SDK
+      - name: Setup Python, Java, Buildozer and Android SDK
         run: |
-            sudo apt update
-            sudo apt install -y python3-venv openjdk-11-jdk build-essential libffi-dev libssl-dev zlib1g-dev
-            # Instalar Cython
-            pip install cython
-            # Configurar JAVA_HOME para que apunte a Java 11
-            sudo update-alternatives --config java
-            echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> $GITHUB_ENV
-            pip install --upgrade pip
-            pip install buildozer
+          sudo apt update
+          sudo apt install -y python3-venv openjdk-11-jdk build-essential libffi-dev libssl-dev zlib1g-dev wget unzip
+          # Instalar Cython
+          pip install cython
+          # Instalar herramientas Android SDK
+          wget https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip -P $HOME/android-sdk
+          unzip $HOME/android-sdk/commandlinetools-linux-7583922_latest.zip -d $HOME/android-sdk/cmdline-tools
+          mkdir -p $HOME/android-sdk/cmdline-tools/latest
+          mv $HOME/android-sdk/cmdline-tools/* $HOME/android-sdk/cmdline-tools/latest
+          export ANDROID_SDK_ROOT=$HOME/android-sdk
+          # Aceptar las licencias de las herramientas de Android
+          yes | sdkmanager --licenses
+          # Instalar las herramientas necesarias
+          sdkmanager "build-tools;36.0.0-rc3" "platform-tools" "platforms;android-30"
+          # Configurar JAVA_HOME para que apunte a Java 11
+          sudo update-alternatives --config java
+          echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> $GITHUB_ENV
+          pip install --upgrade pip
+          pip install buildozer
+
 
       # 3. Compilar el APK
       - name: Build APK
