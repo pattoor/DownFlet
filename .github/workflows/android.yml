@@ -31,6 +31,7 @@ jobs:
           # Eliminar la carpeta extra innecesaria
           rm -rf $HOME/android-sdk/cmdline-tools/cmdline-tools
           export ANDROID_SDK_ROOT=$HOME/android-sdk
+          export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH  # Asegurarnos que sdkmanager esté en el PATH
           # Aceptar las licencias de las herramientas de Android
           yes | sdkmanager --licenses
           # Instalar las herramientas necesarias
