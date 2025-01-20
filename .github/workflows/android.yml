@@ -32,15 +32,17 @@ jobs:
           rm -rf $HOME/android-sdk/cmdline-tools/cmdline-tools
           export ANDROID_SDK_ROOT=$HOME/android-sdk
           export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH  # Asegurarnos que sdkmanager esté en el PATH
-          # Aceptar las licencias de las herramientas de Android
-          yes | sdkmanager --licenses
-          # Instalar las herramientas necesarias
+          # Aceptar licencias y descargar las herramientas necesarias
+          echo "y" | sdkmanager --licenses
           sdkmanager "build-tools;36.0.0-rc3" "platform-tools" "platforms;android-30"
+          # Verificar si AIDL está instalado
+          sdkmanager "tools"
           # Configurar JAVA_HOME para que apunte a Java 11
           sudo update-alternatives --config java
           echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> $GITHUB_ENV
           pip install --upgrade pip
           pip install buildozer
+
 
           
 
