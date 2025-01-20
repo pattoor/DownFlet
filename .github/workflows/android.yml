@@ -14,13 +14,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2. Configurar Python y Buildozer
-      - name: Setup Python and Buildozer
+      # 2. Configurar Python, Java, y Buildozer
+      - name: Setup Python, Java and Buildozer
         run: |
-          sudo apt update
-          sudo apt install -y python3-venv openjdk-11-jdk build-essential libffi-dev libssl-dev zlib1g-dev
-          pip install --upgrade pip
-          pip install buildozer
+            sudo apt update
+            sudo apt install -y python3-venv openjdk-11-jdk build-essential libffi-dev libssl-dev zlib1g-dev
+            # Instalar Cython
+            pip install cython
+            # Configurar JAVA_HOME para que apunte a Java 11
+            sudo update-alternatives --config java
+            echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> $GITHUB_ENV
+            pip install --upgrade pip
+            pip install buildozer
 
       # 3. Compilar el APK
       - name: Build APK
