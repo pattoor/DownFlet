@@ -34,6 +34,7 @@ jobs:
           $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2" "ndk;25.2.9519653"
           export ANDROID_HOME=$HOME/android-sdk
           export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/33.0.2:$PATH
+          yes | sdkmanager --licenses
 
       # 4. Compilar el APK
       - name: Build APK
@@ -46,4 +47,3 @@ jobs:
         with:
           name: AllDownloader-APK
           path: bin/*.apk
-
