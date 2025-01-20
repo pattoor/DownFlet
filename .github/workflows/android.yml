@@ -36,10 +36,8 @@ jobs:
           yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
           
           # Instalar las herramientas necesarias (plataformas, build-tools y NDK)
+          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --update
           $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2" "ndk;25.2.9519653"
-          
-          # Descargar AIDL
-          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "build-tools;33.0.2" "platform-tools" "aidl"
           
           # Establecer las variables de entorno
           export ANDROID_HOME=$HOME/android-sdk
