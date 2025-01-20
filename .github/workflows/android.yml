@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-apk:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       # 1. Clonar el repositorio
@@ -33,10 +33,23 @@ jobs:
         with:
           name: AllDownloader-APK
           path: bin/*.apk
-
-      - name: Install Gradle manually
+      #5. Ajustá el archivo del workflow para usar la última versión de Gradle y Buildozer
+      - name: Install specific Gradle version
         run: |
-          wget https://services.gradle.org/distributions/gradle-8.3-bin.zip
-          sudo unzip -d /opt/gradle gradle-8.3-bin.zip
-          sudo ln -s /opt/gradle/gradle-8.3/bin/gradle /usr/bin/gradle
+          wget https://services.gradle.org/distributions/gradle-8.2-bin.zip
+          sudo unzip -d /opt/gradle gradle-8.2-bin.zip
+          sudo ln -s /opt/gradle/gradle-8.2/bin/gradle /usr/bin/gradle
+
+
+      #6. Limpieza de caché para dependencias
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+
+
 
