@@ -36,16 +36,15 @@ jobs:
           export ANDROID_HOME=$HOME/android-sdk
           export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/34.0.0:$PATH
           
-          # Aceptar licencias (asegurarse de que se acepten todas las licencias)
+          # Aceptar licencias
           yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
           
-          # Limpiar la cache del SDK
-          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --clear-cache
-          
-          # Instalar herramientas necesarias (plataformas, build-tools y NDK)
+          # Actualizar las herramientas y paquetes
           $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --update
-          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;34.0.0" "ndk;25.2.9519653"
-
+          
+          # Instalar herramientas necesarias (incluyendo `aidl`)
+          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "build-tools;34.0.0" "platform-tools" "platforms;android-33" "ndk;25.2.9519653" "cmdline-tools;latest"
+          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "aidl"    
 
           # Establecer las variables de entorno
           export ANDROID_HOME=$HOME/android-sdk
