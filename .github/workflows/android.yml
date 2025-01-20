@@ -15,36 +15,31 @@ jobs:
         uses: actions/checkout@v3
 
       # 2. Configurar Python, Java, Buildozer y Android SDK
-      - name: Setup Python, Java, Buildozer and Android SDK
+      - name: Setup Environment
         run: |
           sudo apt update
           sudo apt install -y python3-venv openjdk-11-jdk build-essential libffi-dev libssl-dev zlib1g-dev wget unzip
           # Instalar Cython
           pip install cython
           # Instalar herramientas Android SDK
-          wget https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip -P $HOME/android-sdk
-          unzip $HOME/android-sdk/commandlinetools-linux-7583922_latest.zip -d $HOME/android-sdk/cmdline-tools
-          # Crear directorio 'latest' si no existe
+          wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip -P $HOME/android-sdk
+          unzip $HOME/android-sdk/commandlinetools-linux-8512546_latest.zip -d $HOME/android-sdk/cmdline-tools
+          # Configurar directorio 'latest'
           mkdir -p $HOME/android-sdk/cmdline-tools/latest
-          # Mover los archivos descomprimidos directamente a la carpeta 'latest'
           mv $HOME/android-sdk/cmdline-tools/cmdline-tools/* $HOME/android-sdk/cmdline-tools/latest/
-          # Eliminar la carpeta extra innecesaria
           rm -rf $HOME/android-sdk/cmdline-tools/cmdline-tools
           export ANDROID_SDK_ROOT=$HOME/android-sdk
-          export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH  # Asegurarnos que sdkmanager esté en el PATH
-          # Aceptar licencias y descargar las herramientas necesarias
-          echo "y" | sdkmanager --licenses
-          sdkmanager "build-tools;36.0.0-rc3" "platform-tools" "platforms;android-30"
-          # Verificar si AIDL está instalado
-          sdkmanager "tools"
-          # Configurar JAVA_HOME para que apunte a Java 11
-          sudo update-alternatives --config java
-          echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> $GITHUB_ENV
+          export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH
+          # Aceptar licencias del SDK
+          yes | sdkmanager --licenses
+          # Instalar dependencias necesarias
+          sdkmanager "platform-tools" "build-tools;33.0.0" "platforms;android-30"
+          # Ajustar permisos
+          chmod +x $ANDROID_SDK_ROOT/platform-tools/adb
+          export PATH=$ANDROID_SDK_ROOT/platform-tools:$PATH
+          # Instalar buildozer
           pip install --upgrade pip
           pip install buildozer
-
-
-          
 
       # 3. Compilar el APK
       - name: Build APK
@@ -57,23 +52,6 @@ jobs:
         with:
           name: AllDownloader-APK
           path: bin/*.apk
-      #5. Ajustá el archivo del workflow para usar la última versión de Gradle y Buildozer
-      - name: Install specific Gradle version
-        run: |
-          wget https://services.gradle.org/distributions/gradle-8.2-bin.zip
-          sudo unzip -d /opt/gradle gradle-8.2-bin.zip
-          sudo ln -s /opt/gradle/gradle-8.2/bin/gradle /usr/bin/gradle
-
-
-      #6. Limpieza de caché para dependencias
-      - name: Cache dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.gradle/caches
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
-
 
 
 
