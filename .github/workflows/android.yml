@@ -20,7 +20,6 @@ jobs:
           sudo apt update
           sudo apt install -y python3 python3-venv python3-pip openjdk-11-jdk build-essential libffi-dev libssl-dev zlib1g-dev unzip wget
           pip install --upgrade pip
-          pip install cython
           pip install buildozer
 
       # 3. Configurar Android SDK
@@ -38,6 +37,7 @@ jobs:
       # 4. Compilar el APK
       - name: Build APK
         run: |
+          pip install cython
           buildozer android debug
 
       # 5. Subir el APK como artefacto
