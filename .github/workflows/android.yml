@@ -14,11 +14,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2. Configurar Android SDK y Buildozer
-      - name: Setup Android SDK and Buildozer
+      # 2. Configurar Python, Cython y Buildozer
+      - name: Setup Python, Cython and Buildozer
         run: |
           sudo apt update
-          sudo apt install -y python3-venv openjdk-11-jdk build-essential libffi-dev libssl-dev zlib1g-dev unzip wget
+          sudo apt install -y python3 python3-venv python3-pip openjdk-11-jdk build-essential libffi-dev libssl-dev zlib1g-dev unzip wget
+          pip install --upgrade pip
+          pip install cython
+          pip install buildozer
+
+      # 3. Configurar Android SDK
+      - name: Setup Android SDK
+        run: |
           wget https://dl.google.com/android/repository/commandlinetools-linux-9123335_latest.zip -O cmdline-tools.zip
           mkdir -p $HOME/android-sdk/cmdline-tools
           unzip cmdline-tools.zip -d $HOME/android-sdk/cmdline-tools
@@ -27,17 +34,16 @@ jobs:
           $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2" "ndk;25.2.9519653"
           export ANDROID_HOME=$HOME/android-sdk
           export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/33.0.2:$PATH
-          pip install --upgrade pip
-          pip install buildozer
 
-      # 3. Compilar el APK
+      # 4. Compilar el APK
       - name: Build APK
         run: |
           buildozer android debug
 
-      # 4. Subir el APK como artefacto
+      # 5. Subir el APK como artefacto
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
           name: AllDownloader-APK
           path: bin/*.apk
+
