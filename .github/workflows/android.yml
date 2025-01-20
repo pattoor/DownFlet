@@ -33,3 +33,10 @@ jobs:
         with:
           name: AllDownloader-APK
           path: bin/*.apk
+
+      - name: Install Gradle manually
+        run: |
+          wget https://services.gradle.org/distributions/gradle-8.3-bin.zip
+          sudo unzip -d /opt/gradle gradle-8.3-bin.zip
+          sudo ln -s /opt/gradle/gradle-8.3/bin/gradle /usr/bin/gradle
+
