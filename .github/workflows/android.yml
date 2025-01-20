@@ -25,31 +25,27 @@ jobs:
 
       # 3. Configurar Android SDK
       - name: Setup Android SDK
-        run: | 
+        run: |
           # Descargar y extraer herramientas de línea de comandos del SDK
-          wget https://dl.google.com/android/repository/commandlinetools-linux-9123335_latest.zip -O cmdline-tools.zip
+          wget https://dl.google.com/android/repository/commandlinetools-linux-6609375_latest.zip -O cmdline-tools.zip
           mkdir -p $HOME/android-sdk/cmdline-tools
           unzip cmdline-tools.zip -d $HOME/android-sdk/cmdline-tools
           mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
           
           # Establecer las variables de entorno
-          export ANDROID_HOME=$HOME/android-sdk
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/34.0.0:$PATH
+          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "PATH=$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools:$HOME/android-sdk/build-tools/33.0.0:$PATH" >> $GITHUB_ENV
           
           # Aceptar licencias
           yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
           
-          # Actualizar las herramientas y paquetes
+          # Limpiar caché y actualizar
+          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --clear_cache
           $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --update
           
           # Instalar herramientas necesarias (incluyendo `aidl`)
-          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "build-tools;34.0.0" "platform-tools" "platforms;android-33" "ndk;25.2.9519653" "cmdline-tools;latest"
-          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "aidl"    
+          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "build-tools;33.0.0" "platform-tools" "platforms;android-33" "ndk;25.2.9519653" "cmdline-tools;latest"
 
-          # Establecer las variables de entorno
-          export ANDROID_HOME=$HOME/android-sdk
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/34.0.0:$PATH
-          
           # Verificar que todo esté instalado correctamente
           $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --list
 
