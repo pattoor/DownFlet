@@ -117,7 +117,7 @@ def main(page: ft.Page):
         download_button,
         progress_bar,
         output_text,
-        download_path_text,  # Añadir la ruta del archivo al final
+        download_path_text,  
     )
 
 # Ejecutar la aplicación
