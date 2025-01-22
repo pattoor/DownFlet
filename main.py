@@ -1,9 +1,6 @@
 import flet as ft
 from yt_dlp import YoutubeDL
 import requests
-from PIL import Image
-from io import BytesIO
-import os
 
 def main(page: ft.Page):
     # Configuración inicial de la página
@@ -43,6 +40,7 @@ def main(page: ft.Page):
     # Botón de descarga
     download_button = ft.ElevatedButton("Descargar", disabled=True, width=150)
 
+    # Función para buscar el video
     def buscar_video(e):
         url = url_input.value
         if not url:
@@ -84,12 +82,59 @@ def main(page: ft.Page):
 
         page.update()
 
+    # Función para descargar el video
+    def descargar_video(e):
+        url = url_input.value
+        if not url:
+            output_text.value = "Por favor, ingresa un enlace válido."
+            page.update()
+            return
+
+        # Cambiar color y texto del botón al iniciar la descarga
+        download_button.text = "Descargando..."
+        download_button.bgcolor = ft.colors.LIGHT_BLUE
+        page.update()
+
+        try:
+            ydl_opts = {
+                "outtmpl": f"{output_dir}/%(title)s.%(ext)s",  # Carpeta de salida
+                "format": "best",  # Mejor calidad disponible
+                "progress_hooks": [hook_progreso],  # Progreso
+            }
+            with YoutubeDL(ydl_opts) as ydl:
+                info = ydl.extract_info(url, download=True)
+                download_path_text.value = f"Archivo guardado en: {output_dir}/{info['title']}.{info['ext']}"
+                output_text.value = "¡Descarga completada!"
+                page.update()
+
+        except Exception as e:
+            output_text.value = f"Error al descargar: {str(e)}"
+            download_path_text.value = ""
+
+        # Restaurar el botón al estado inicial
+        download_button.text = "Descargar"
+        download_button.bgcolor = ft.colors.BLUE
+        page.update()
+
+    # Actualizar progreso de la descarga
+    def hook_progreso(d):
+        if d["status"] == "downloading":
+            progreso = d.get("downloaded_bytes", 0) / d.get("total_bytes", 1)
+            progress_bar.value = progreso
+            page.update()
+        elif d["status"] == "finished":
+            progress_bar.value = 1
+            page.update()
+
+    # Configurar acciones de los botones
+    download_button.on_click = descargar_video
+
     # Agregar elementos a la página
     page.add(
         title_app,
         url_input,
         search_button,
-        thumbnail_image,  # Imagen se mantiene invisible hasta buscar
+        thumbnail_image,
         download_button,
         progress_bar,
         output_text,
