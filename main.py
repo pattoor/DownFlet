@@ -1,6 +1,7 @@
 import flet as ft
 from yt_dlp import YoutubeDL
 import requests
+import os
 
 def main(page: ft.Page):
     # Configuración inicial de la página
@@ -110,14 +111,14 @@ def main(page: ft.Page):
             }
             with YoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(url, download=True)
-                download_path_text.value = f"Archivo guardado en: {output_dir}/{info['title']}.{info['ext']}"
                 output_text.value = "¡Descarga completada!"
-                page.update()
-
-              # Forzar indexación en Media Store -> (android)
-                import os
-                os.system(f"am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:///storage/emulated/0/Download/Downflet-videos/{info['title']}.{info['ext']}")
-
+                page.update()  # Actualizar después de completar la descarga
+    
+                # Forzar indexación del archivo descargado
+                video_path = f"/storage/emulated/0/Download/videos/{info['title']}.{info['ext']}"
+                os.system(f"am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file://{video_path}")
+                #output_text.value += " (Indexado en galería)"
+                page.update()  # Mostrar confirmación de indexación (dudoso)
         except Exception as e:
             output_text.value = f"Error al descargar: {str(e)}"
             download_path_text.value = ""
