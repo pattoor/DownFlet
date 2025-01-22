@@ -13,7 +13,8 @@ def main(page: ft.Page):
     output_text = ft.Text(size=12)
     progress_bar = ft.ProgressBar(width=300, value=0)
     download_path_text = ft.Text(size=12)
-    output_dir = "/storage/emulated/0/Download/Downflet-videos"
+    output_dir = "/storage/emulated/0/Download/Downflet-videos" #android
+    #output_dir = "videos/%(title)s.%(ext)s" #pc
 
     # Campo de entrada
     url_input = ft.TextField(
@@ -101,13 +102,15 @@ def main(page: ft.Page):
 
         try:
             ydl_opts = {
-                "outtmpl": "videos/%(title)s.%(ext)s",  # Carpeta de salida
+                #"outtmpl": "videos/%(title)s.%(ext)s",  # Carpeta de salida(pc)
+                #"outtmpl": "/storage/emulated/0/Download/%(title)s.%(ext)s", #op1
+                "outtmpl": f"{output_dir}/%(title)s.%(ext)s", #op2              
                 "format": "best",  # Mejor calidad disponible
                 "progress_hooks": [hook_progreso],  # Progreso
             }
             with YoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(url, download=True)
-                download_path_text.value = f"Archivo guardado en: videos/{info['title']}.{info['ext']}"
+                download_path_text.value = f"Archivo guardado en: {output_dir}/{info['title']}.{info['ext']}"
                 output_text.value = "¡Descarga completada!"
                 page.update()
 
