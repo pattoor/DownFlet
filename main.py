@@ -23,6 +23,9 @@ def main(page: ft.Page):
         focused_border_color=ft.colors.WHITE,
     )
 
+    # Variable para almacenar el enlace del video
+    url_video = {"link": ""}
+
     # Imagen del thumbnail (oculta inicialmente)
     thumbnail_image = ft.Image(
         width=150,
@@ -65,7 +68,8 @@ def main(page: ft.Page):
                     thumbnail_image.src = thumbnail_url
                     thumbnail_image.visible = True  # Mostrar el thumbnail
                     thumbnail_image.update()
-                    url_input.value = ""
+                    url_video["link"] = url  # Guardar el enlace en la variable
+                    url_input.value = ""  # Limpiar el campo de entrada
                     url_input.update()
                     output_text.value = f"Video encontrado: {info['title']}"
                     download_button.disabled = False
@@ -84,9 +88,9 @@ def main(page: ft.Page):
 
     # Función para descargar el video
     def descargar_video(e):
-        url = url_input.value
+        url = url_video["link"]  # Usar el enlace guardado
         if not url:
-            output_text.value = "Por favor, ingresa un enlace válido."
+            output_text.value = "Por favor, busca un video antes de descargarlo."
             page.update()
             return
 
@@ -97,13 +101,13 @@ def main(page: ft.Page):
 
         try:
             ydl_opts = {
-                "outtmpl": f"{output_dir}/%(title)s.%(ext)s",  # Carpeta de salida
+                "outtmpl": "videos/%(title)s.%(ext)s",  # Carpeta de salida
                 "format": "best",  # Mejor calidad disponible
                 "progress_hooks": [hook_progreso],  # Progreso
             }
             with YoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(url, download=True)
-                download_path_text.value = f"Archivo guardado en: {output_dir}/{info['title']}.{info['ext']}"
+                download_path_text.value = f"Archivo guardado en: videos/{info['title']}.{info['ext']}"
                 output_text.value = "¡Descarga completada!"
                 page.update()
 
