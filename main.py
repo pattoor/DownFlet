@@ -37,8 +37,7 @@ def main(page: ft.Page):
     search_button = ft.ElevatedButton(
         "Buscar Video",
         on_click=lambda e: buscar_video(e),
-        width=150,
-        bgcolor=ft.colors.LIGHT_BLUE_50,
+        width=150
     )
 
     # Botón de descarga
