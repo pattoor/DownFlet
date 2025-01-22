@@ -114,6 +114,10 @@ def main(page: ft.Page):
                 output_text.value = "¡Descarga completada!"
                 page.update()
 
+              # Forzar indexación en Media Store -> (android)
+                import os
+                os.system(f"am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:///storage/emulated/0/Download/Downflet-videos/{info['title']}.{info['ext']}")
+
         except Exception as e:
             output_text.value = f"Error al descargar: {str(e)}"
             download_path_text.value = ""
