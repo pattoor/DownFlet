@@ -14,7 +14,8 @@ def main(page: ft.Page):
     output_text = ft.Text(size=12)
     progress_bar = ft.ProgressBar(width=300, value=0)
     download_path_text = ft.Text(size=12)
-    output_dir = "/storage/emulated/0/Download/Downflet-videos" #android
+    #output_dir = "/storage/emulated/0/Download/Downflet-videos" #android op1
+    output_dir = "/storage/emulated/0/Movies/DownFletVideos" #android op2
     #output_dir = "videos/%(title)s.%(ext)s" #pc
 
     # Campo de entrada
@@ -90,43 +91,46 @@ def main(page: ft.Page):
 
     # Función para descargar el video
     def descargar_video(e):
-        url = url_video["link"]  # Usar el enlace guardado
-        if not url:
-            output_text.value = "Por favor, busca un video antes de descargarlo."
+    url = url_video["link"]  # Usar el enlace guardado
+    if not url:
+        output_text.value = "Por favor, busca un video antes de descargarlo."
+        page.update()
+        return
+
+    # Cambiar color y texto del botón al iniciar la descarga
+    download_button.text = "Descargando..."
+    download_button.bgcolor = ft.colors.LIGHT_BLUE
+    page.update()
+
+    try:
+        # comprueba existencia de carpeta de descargas 
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
+        # Configuración de yt-dlp
+        ydl_opts = {
+            "outtmpl": f"{output_dir}/%(title)s.%(ext)s",  # Carpeta de salida
+            "format": "best",
+            "progress_hooks": [hook_progreso],  # Progreso
+        }
+        with YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=True)
+            output_text.value = "¡Descarga completada!"
+            download_path_text.value = f"Archivo guardado en: {output_dir}/{info['title']}.{info['ext']}"
+
+            # Confirmar que el archivo estará visible
+            output_text.value += " (Guardado en Memoria interna/Movies)"
             page.update()
-            return
 
-        # Cambiar color y texto del botón al iniciar la descarga
-        download_button.text = "Descargando..."
-        download_button.bgcolor = ft.colors.LIGHT_BLUE
-        page.update()
+    except Exception as e:
+        output_text.value = f"Error al descargar: {str(e)}"
+        download_path_text.value = ""
 
-        try:
-            ydl_opts = {
-                #"outtmpl": "videos/%(title)s.%(ext)s",  # Carpeta de salida(pc)
-                #"outtmpl": "/storage/emulated/0/Download/%(title)s.%(ext)s", #op1
-                "outtmpl": f"{output_dir}/%(title)s.%(ext)s", #op2              
-                "format": "best",  # Mejor calidad disponible
-                "progress_hooks": [hook_progreso],  # Progreso
-            }
-            with YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(url, download=True)
-                output_text.value = "¡Descarga completada!"
-                page.update()  # Actualizar después de completar la descarga
-    
-                # Forzar indexación del archivo descargado
-                video_path = f"/storage/emulated/0/Download/videos/{info['title']}.{info['ext']}"
-                os.system(f"am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file://{video_path}")
-                #output_text.value += " (Indexado en galería)"
-                page.update()  # Mostrar confirmación de indexación (dudoso)
-        except Exception as e:
-            output_text.value = f"Error al descargar: {str(e)}"
-            download_path_text.value = ""
+    # Restaurar el botón al estado inicial
+    download_button.text = "Descargar"
+    download_button.bgcolor = ft.colors.BLUE
+    page.update()
 
-        # Restaurar el botón al estado inicial
-        download_button.text = "Descargar"
-        download_button.bgcolor = ft.colors.BLUE
-        page.update()
 
     # Actualizar progreso de la descarga
     def hook_progreso(d):
